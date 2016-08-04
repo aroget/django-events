@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block title %}Home Page{% endblock %} {% block content %}
+<div class="hero" style="background-image: url('https://unsplash.it/1500/300/?random'); height: 300px;"></div>
+
+<h1>Upcoming Events</h1>
+
+{% if selected_event %}
+  <p>Successfully registered for {{ selected_event }}</p>
+{% endif %}
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Date</th>
+      <th>Spots Left</th>
+      <th>Register</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for event in events %}
+    <tr>
+      <td>{{ event.name }}</td>
+      <td>{{ event.date | date }}</td>
+      <td>{{ event.spots_available }}</td>
+      <td>
+        {% if user.is_authenticated %}
+          {% if event.attendees.all  %}
+            {% if user in event.attendees.all %}
+              <button class="btn btn-default" type="submit">Registered</button>
+            {% else %}
+              <form action="{% url 'events:welcome' %}" method='POST'>
+                {% csrf_token %}
+                <input type="hidden" name="event_name" value="{{event.id}}">
+                <button class="btn btn-primary" type="submit">Save my spot</button>
+              </form>
+            {% endif %}
+          {% else %}
+            <form action="{% url 'events:welcome' %}" method='POST'>
+              {% csrf_token %}
+              <input type="hidden" name="event_name" value="{{event.id}}">
+              <button class="btn btn-primary" type="submit">Save my spot</button>
+            </form>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'login' %}" class="btn btn-default">Sign In</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
