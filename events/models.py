@@ -28,7 +28,8 @@ class Event(models.Model):
   def spots_available(self):
     return self.number_of_participants - self.number_of_attendees
 
-  def current_events():
+  @classmethod
+  def current_events(cls):
     return Event.objects.filter(number_of_attendees__lt = F('number_of_participants')).filter(date__gte=datetime.date.today())
 
   class Meta:
